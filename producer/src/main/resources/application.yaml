@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: producer
+
+  kafka:
+    producer:
+      bootstrap-servers: ${BOOTSTRAP_SERVERS}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all    # Запись производится во все реплики топика
+      retries: 3

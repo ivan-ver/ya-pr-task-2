@@ -1,0 +1,5 @@
+Команда создания топика (выполнять после запуска docker-контейнеров zookeeper и kafka):
+docker exec -it ya-pr-task-2-kafka_1-1 kafka-topics --create --bootstrap-server kafka_1:29092 --topic yandex.practicum.task-2.topic --partitions 3 --replication-factor 2
+
+Просмотреть список топиков:
+docker exec -it ya-pr-task-2-kafka_1-1 kafka-topics --describe --bootstrap-server kafka_1:29092
