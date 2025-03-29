@@ -28,6 +28,7 @@ services:
     hostname: kafka_2
     depends_on:
       - zookeeper
+      - kafka_1
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181

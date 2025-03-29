@@ -1,10 +1,9 @@
-package ru.ivan.ver.producer;
+package ru.ivan.ver.producer.config;
 
 import lombok.SneakyThrows;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.common.config.TopicConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,20 +22,45 @@ import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CL
 import static org.apache.kafka.clients.producer.ProducerConfig.RETRIES_CONFIG;
 import static org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG;
 
-
+/**
+ * Конфигурационный класс для настройки Kafka Producer и администрирования топиков.
+ * <p>
+ * Создает и настраивает:
+ * <ul>
+ *   <li>Конфигурацию для Kafka Producer</li>
+ *   <li>Экземпляр KafkaProducer для отправки сообщений</li>
+ *   <li>AdminClient для управления топиками (создание, проверка существования)</li>
+ * </ul>
+ *
+ * Настройки загружаются из application.properties/application.yml через аннотации @Value.
+ */
 @Configuration
 public class KafkaConfiguration {
+    /** Адреса брокеров Kafka для подключения */
     @Value("${spring.kafka.producer.bootstrap-servers}")
     private String bootstrapServer;
+
+    /** Сериализатор для ключей сообщений */
     @Value("${spring.kafka.producer.key-serializer}")
     private String keySerializer;
+
+    /** Сериализатор для значений сообщений */
     @Value("${spring.kafka.producer.value-serializer}")
     private String valueSerializer;
+
+    /** Уровень подтверждения получения сообщения (acks) */
     @Value("${spring.kafka.producer.acks}")
     private String acksConfig;
+
+    /** Количество повторных попыток отправки сообщения при ошибках */
     @Value("${spring.kafka.producer.retries}")
     private Integer retries;
 
+    /**
+     * Создает конфигурацию для Kafka Producer.
+     *
+     * @return Properties с настройками для Kafka Producer
+     */
     @Bean
     public Properties producerConfigs() {
         Properties properties = new Properties();
@@ -48,13 +72,34 @@ public class KafkaConfiguration {
         return properties;
     }
 
+    /**
+     * Создает и возвращает экземпляр KafkaProducer для отправки сообщений.
+     *
+     * @param producerConfigs настройки producer'а
+     * @return KafkaProducer для работы с сообщениями типа MessageDto
+     */
     @Bean
     public KafkaProducer<String, MessageDto> producer(Properties producerConfigs) {
         return new KafkaProducer<>(producerConfigs);
     }
 
     /**
-     Топик с заданным количеством реплик и партиций создается (если такого нет в kafka) автоматически при запуске приложения
+     * Создает и настраивает AdminClient для управления топиками Kafka.
+     * <p>
+     * При инициализации:
+     * <ol>
+     *   <li>Получает список всех топиков из класса TopicList</li>
+     *   <li>Проверяет существующие топики в Kafka</li>
+     *   <li>Создает отсутствующие топики с параметрами:
+     *     <ul>
+     *       <li>Количество партиций: 3</li>
+     *       <li>Фактор репликации: 2</li>
+     *     </ul>
+     *   </li>
+     * </ol>
+     *
+     * @return AdminClient для административных операций с Kafka
+     * @throws RuntimeException если произошла ошибка при доступе к полям TopicList
      */
     @SneakyThrows
     @Bean

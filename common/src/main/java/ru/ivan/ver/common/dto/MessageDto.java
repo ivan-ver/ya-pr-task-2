@@ -9,8 +9,17 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import java.time.LocalDateTime;
 
 /**
- Для сериализации/десериализации даты необходимо дописать аннотации с указанием сриализатора/десериализатора
- и формата записи даты
+ * DTO (Data Transfer Object) для представления сообщения.
+ * Содержит тему, текст сообщения и дату/время создания.
+ * Используется для передачи данных через Kafka.
+ *
+ * @param subject Тема сообщения (заголовок)
+ * @param message Текст сообщения
+ * @param dateTime Дата и время создания сообщения в формате "yyyy-MM-dd HH:mm:ss"
+ *
+ * @see LocalDateTimeSerializer Сериализатор для преобразования LocalDateTime в строку
+ * @see LocalDateTimeDeserializer Десериализатор для преобразования строки в LocalDateTime
+ * @see JsonFormat Аннотация для определения формата сериализации даты/времени
  */
 public record MessageDto(
         String subject,
